@@ -1,5 +1,11 @@
+#ifndef Driver_h
+#define Driver_h
+
 #include <Arduino.h>
 #include <Control.h>
+
+#include <nRF24L01.h>
+#include <RF24.h>
 
 class Driver {
     public: 
@@ -14,10 +20,17 @@ class Driver {
             int ignitionPin     // Пин управления зажиганием
         );
         void drive(control_t data);
+        void remoteDrive();
         void setZeroDelta(int v);
         void setMaxDelta(int v);
 
+        void setupRadio();
+        
     private:
+        RF24 radio;
+        //byte pipe[6] = "00001";
+        control_t data;
+
         int acceleratorPin;
         int ignitionPin;
 
@@ -43,4 +56,6 @@ class Driver {
         
         void calculate(int x, int y);
         void write();
+        bool receiveData();
 };
+#endif

@@ -53,6 +53,36 @@ void Driver::setZeroDelta(int v) {
     this->delta_zero = v;
 }
 
+void Driver::setupRadio() {
+    RF24 radio(9, 10);
+    if (radio.begin()) {
+        Serial.println("radio begin");
+    } else {
+        Serial.println("radio not begin");
+    }
+    delay(3000);
+    radio.openReadingPipe(0, 0xF0F0F0F0F0);
+    radio.setChannel(0x5A);
+    //radio.setPALevel(RF24_PA_MIN);
+    radio.startListening();
+    
+    //radio.setPALevel(RF24_PA_MIN);
+    //radio.setDataRate(RF24_250KBPS);
+    //radio.setChannel(80);
+    //radio.startListening();
+}
+
+bool Driver::receiveData() {
+    if (radio.available()) {
+        Serial.println("ava");
+        radio.read(&data, sizeof(data));
+        Serial.println(data.xPosition);
+        return true;
+    }
+    Serial.println("not ava");
+    return false;
+}
+
 void Driver::write() {
     digitalWrite(this->ignitionPin, this->ignition);
     analogWrite(this->acceleratorPin, this->accValue);
@@ -65,6 +95,12 @@ void Driver::write() {
     digitalWrite(this->rightD1Pin, this->rightD1);
     digitalWrite(this->rightD2Pin, this->rightD2);
     analogWrite(this->rightPwmPin, this->rightValue);
+}
+
+void Driver::remoteDrive() {
+    if (this->receiveData()) {
+        this->drive(this->data);
+    }
 }
 
 void Driver::drive(control_t data) {

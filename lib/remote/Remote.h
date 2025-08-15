@@ -1,5 +1,10 @@
+#ifndef Remote_h
+#define Remote_H
+
 #include <Arduino.h>
 #include <Control.h>
+#include <nRF24L01.h>
+#include <RF24.h>
 
 class Remote {
 private:
@@ -9,6 +14,8 @@ private:
     int acceleratorPin;
     control_t data;
     void read();
+    RF24 radio;
+    //byte pipe[6] = "00001";
 public:
     // Конструктор
     Remote(
@@ -23,5 +30,8 @@ public:
      * @param read - предварительное чтение значений
      */ 
     control_t get(bool read = true); 
+    void send(bool read = true); 
+    void setupRadio();
 };
 
+#endif
